@@ -19,15 +19,35 @@ const createTerminal = catchAsync(async (req, res) => {
   //  const options = { headers: { Authorization: process.env.TOKEN } }
   //  const result = await axios.post(url, {action:action,channelId:channel_id,contentOwnerId:content_owner_id,data:epgDataToSend,jobId:jobId}, options)
   const url=process.env.CMS_URL+cmsEndPoint.syncTerminal
+  let cmsResult
   console.log('url:',url)
-  const cmsResult=await axios.post(url, terminalResult, {})
-  console.log('cmsResult:',cmsResult.status)
-  if(cmsResult.status===200){
+
+
+  try{
+const cmsTerminalData={    
+      data: {
+        storeId: terminalResult.storeId,
+        storeName: terminalResult.storeName,
+        terminalId: terminalResult.terminalId,
+        macAddress: terminalResult.macAddress,
+        fcmToken: 'text',
+        city: terminalResult.city,
+        manager: terminalResult.manager,
+      }
+  }
+  console.log('cmsTerminalData:',cmsTerminalData)
+      cmsResult=await axios.post(url, cmsTerminalData, {})
+  }catch(e){
+    console.log('terminal sync errr  :',e)
+
+  }
+    
+  if(cmsResult.data.success){
     const updateResult= await Terminal.updateOne({terminalId:id},{syncToCms:'1' },{})
     console.log('updateResult:',updateResult)
   }
 
-  res.status(httpStatus.CREATED).send(terminalResult);
+  res.status(httpStatus.CREATED).send(cmsResult.data);
 });
 
 const getTerminals = catchAsync(async (req, res) => {

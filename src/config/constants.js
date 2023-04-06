@@ -1,6 +1,6 @@
 
 const cmsEndPoint={
-    syncTerminal:"/v1/terminal/cms"
+    syncTerminal:"/rest/V1/dmb/terminal/register"
 }
 
 module.exports={ cmsEndPoint }
