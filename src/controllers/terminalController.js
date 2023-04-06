@@ -47,7 +47,7 @@ const cmsTerminalData={
     console.log('updateResult:',updateResult)
   }
 
-  res.status(httpStatus.CREATED).send(cmsResult.data);
+  res.status(httpStatus.CREATED).send(terminalResult);
 });
 
 const getTerminals = catchAsync(async (req, res) => {
