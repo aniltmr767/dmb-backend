@@ -3,9 +3,7 @@ const mongoose = require('mongoose');
 const dmbVersionSchema = mongoose.Schema(
   {
     versionId: {
-      type: String,
-      unique: true,
-      dropDups: true ,
+      type: String,     
       required: true,
       trim: true,
     }, 
