@@ -5,6 +5,7 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const socketNamespace=io.of('/socket')
 const PORT = process.env.PORT || 3000;
+const httpStatus = require('http-status');
 
 const helmet = require('helmet');
 const xss = require('xss-clean');
@@ -42,9 +43,8 @@ app.use('/v1',routes,(req,res,next)=>{
      const storeId= req.outputData.storeId
      console.log('storeId:',storeId) 
       socketNamespace.to(storeId).emit('dmb-version-added',req.outputData);  
+      res.status(httpStatus.OK).send(req.outputData)
     }
-    
-    res.send(req.outputData)
     next()
   });
  

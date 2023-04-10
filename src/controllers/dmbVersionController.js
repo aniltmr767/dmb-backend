@@ -20,12 +20,25 @@ const createVersion = catchAsync(async (req, res,next) => {
       minutes:dateResult.minutes,
       timeInMinutes:dateResult.timeInMinutes
     }
-     const result=await DmbVersion.create(insertData);  
-     res.status(httpStatus.CREATED) 
 
-     req.query.syncToPwa=true
-     req.outputData=result
-     next()
+    const versionResult=await DmbVersion.findOne({ 
+        storeId:inputBody.storeId  ,        
+        versionId :inputBody.versionId  
+    } );
+ 
+      if(versionResult){
+        console.log('version alreday exist')
+        res.status(httpStatus.UNPROCESSABLE_ENTITY).send({success:false,message:"Please send a unique version id"});
+      
+      }else{
+        const result=await DmbVersion.create(insertData);  
+        res.status(httpStatus.CREATED) 
+
+        req.query.syncToPwa=true
+        req.outputData=result
+        
+      }
+      next()    
  
   });
 
