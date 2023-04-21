@@ -8,30 +8,104 @@ const { cmsEndPoint}=require('../config/constants')
 
 const createTerminal = catchAsync(async (req, res) => {
   console.log('== Inside createTerminal ==') 
+  const InputParams=req.params
   const inputBody=req.body
+  const dataExist=await Terminal.findOne({macAddress:inputBody.macAddress});  
+ console.log(dataExist)
+   
+  if(dataExist){
+    res.status(httpStatus.OK).send(dataExist); 
+  }else{
+  
+
+
+
+
+
+    console.log('req params',req.params)
+
+   const storeUrl=process.env.FETCH_STORE_URL
+
+    const storeParams = {
+        'addressSubType': 'DELIVERY',
+        'lat': '24.4638305',
+        'lng': '54.67403110000001',
+        'screen': 'LOCATION',
+    }
+
+    const headers = {
+      'brand': 'KFC',
+      'appversion': '7.16.1',
+      'devicetype': 'IOS',
+      'deviceid': '6DF53C3C-DC8F-4CFA-B13A-EC8908243859',
+      'language': 'En',
+      'timezone': 'Asia/Kolkata',
+      'devicemodel': 'DMB',
+      'country': 'UAE',
+      'osversion': '15.7.3',
+    }
+
+
+    if(inputBody.lat){
+      storeParams.lat=inputBody.lat
+    }
+    if(inputBody.lng){
+      storeParams.lng=inputBody.lng
+    }
+
+
+    if(InputParams.country){
+     headers.country=InputParams.country
+    }
+
+    if(InputParams.brand){
+      headers.brand=InputParams.brand
+      }
+
+    if(inputBody.timezone){
+      headers.timezone=inputBody.timezone
+      }
+
+   const paramString=`?addressSubType=${storeParams.addressSubType}&lat=${storeParams.lat}&lng=${storeParams.lng}&screen=${storeParams.screen}`
+
+   console.log('store url:',storeUrl+paramString)
+   console.log('headers:', headers)
+   const storeResult=await axios.get(storeUrl+paramString,  {headers:headers})
+
+   
+   console.log('fetching store data :',storeResult.status)
+   if(storeResult.status===200){
+    const {countryId,cityId,storeId}=storeResult.data.data.store
+    console.log('storeId:',storeResult.data.data.store)
+
+   
   const id=await generateTerminalId();
   console.log('id:',id)
   inputBody.terminalId=id
-   const terminalResult=await Terminal.create(inputBody);
+
+  inputBody.brand=InputParams.brand
+  inputBody.manager=InputParams.manager
+  inputBody.countryId=countryId
+  inputBody.cityId=cityId
+  inputBody.storeId=storeId
+  const terminalResult=await Terminal.create(inputBody);
 
    console.log('terminalResult:',terminalResult)
 
-  //  const options = { headers: { Authorization: process.env.TOKEN } }
-  //  const result = await axios.post(url, {action:action,channelId:channel_id,contentOwnerId:content_owner_id,data:epgDataToSend,jobId:jobId}, options)
   const url=process.env.CMS_URL+cmsEndPoint.syncTerminal
   let cmsResult
   console.log('url:',url)
-
 
   try{
 const cmsTerminalData={    
       data: {
         storeId: terminalResult.storeId,
-        storeName: terminalResult.storeName,
+        countryId:terminalResult.countryId,
+        cityId:terminalResult.cityId,
+        brand:terminalResult.brand,
         terminalId: terminalResult.terminalId,
         macAddress: terminalResult.macAddress,
-        fcmToken: 'text',
-        city: terminalResult.city,
+        fcmToken: 'text',        
         manager: terminalResult.manager,
       }
   }
@@ -48,6 +122,10 @@ const cmsTerminalData={
   }
 
   res.status(httpStatus.CREATED).send(terminalResult);
+}else{
+  res.status(httpStatus.UNPROCESSABLE_ENTITY).send({success:false,message:"Please send valida parameters"});
+}
+}
 });
 
 const getTerminals = catchAsync(async (req, res) => {

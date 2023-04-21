@@ -14,7 +14,12 @@ const terminalSchema = mongoose.Schema(
       required: true,
       trim: true,
     },  
-    storeName: {
+    brand: {
+      type: String,   
+      required: true,
+      trim: true,
+    },
+    countryId: {
       type: String,     
       required: true,
       trim: true,
@@ -24,7 +29,7 @@ const terminalSchema = mongoose.Schema(
       required: true,
       trim: true,
     },
-    city: {
+    cityId: {
       type: String,     
       required: true,
       trim: true,

@@ -5,7 +5,7 @@ const router = express.Router();
 
 
 router.post( '/cms' , terminalController.getTerminals);
-router.post('/', terminalController.createTerminal);
+router.post('/register/:country/:brand/:manager', terminalController.createTerminal);
 router.put('/', terminalController.updateTerminal);
 module.exports = router;
 

@@ -12,7 +12,7 @@ const convertToUTC =(inputTimeStamp)=>{
      const minutes=timeString[1]
      const timeInMinutes=parseInt(hours) * 60 + parseInt(minutes)
      
-     const utcDateInNumbers=parseInt(utcDate.replace(/-/g,''))    
+     const utcDateInNumbers=parseInt(utcDate.replace(/-/g,''))  
     return {utcTimeStamp,utcDate,utcDateInNumbers,hours,minutes,timeInMinutes}
  }
 
