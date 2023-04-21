@@ -19,6 +19,11 @@ const terminalSchema = mongoose.Schema(
       required: true,
       trim: true,
     },
+    storeName: {
+      type: String,   
+      required: true,
+      trim: true,
+    },
     countryId: {
       type: String,     
       required: true,

@@ -75,8 +75,8 @@ const createTerminal = catchAsync(async (req, res) => {
    
    console.log('fetching store data :',storeResult.status)
    if(storeResult.status===200){
-    const {countryId,cityId,storeId}=storeResult.data.data.store
-    console.log('storeId:',storeResult.data.data.store)
+    const {countryId,cityId,storeId,name_en}=storeResult.data.data.store
+    console.log('storeDetails:',storeResult.data.data.store)
 
    
   const id=await generateTerminalId();
@@ -88,6 +88,7 @@ const createTerminal = catchAsync(async (req, res) => {
   inputBody.countryId=countryId
   inputBody.cityId=cityId
   inputBody.storeId=storeId
+  inputBody.storeName=name_en
   const terminalResult=await Terminal.create(inputBody);
 
    console.log('terminalResult:',terminalResult)
@@ -107,6 +108,7 @@ const cmsTerminalData={
         macAddress: terminalResult.macAddress,
         fcmToken: 'text',        
         manager: terminalResult.manager,
+        storeName: terminalResult.storeName,
       }
   }
   console.log('cmsTerminalData:',cmsTerminalData)
