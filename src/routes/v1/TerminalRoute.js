@@ -4,11 +4,12 @@ const terminalController = require('../../controllers/terminalController');
 const router = express.Router();
 
 
-router.post( '/cms' , terminalController.getTerminals);
+router.post('/cms', terminalController.getTerminals);
 router.post('/register/:country/:brand/:manager', terminalController.createTerminal);
 router.put('/', terminalController.updateTerminal);
-router.get( '/store/:country/:brand' , terminalController.getPickupStore);
-module.exports = router; 
+router.get('/store/:country/:brand', terminalController.getPickupStore);
+router.post('/converttoblob', terminalController.convertUrlToBlob);
+module.exports = router;
 
 /**
  * @swagger

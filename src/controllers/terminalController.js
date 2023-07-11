@@ -5,7 +5,8 @@ const { Terminal, Config } = require('../models');
 const catchAsync = require('../utils/catchAsync');
 const axios = require("axios");
 const { cmsEndPoint } = require('../config/constants')
-let options = {json: true};
+var fetch = require("node-fetch")
+let options = { json: true };
 
 const createTerminal = catchAsync(async (req, res) => {
   console.log('== Inside createTerminal ==')
@@ -91,7 +92,7 @@ const createTerminal = catchAsync(async (req, res) => {
 
     console.log('store url:', storeUrl + paramString)
     console.log('headers:', headers)
-     const storeResult=await axios.get(storeUrl+paramString,  {headers:headers})
+    const storeResult = await axios.get(storeUrl + paramString, { headers: headers })
 
 
     console.log('fetching store data :', storeResult.status)
@@ -242,29 +243,58 @@ const getPickupStore = catchAsync(async (req, res) => {
       baseUrl = process.env.HRD_CDN_BASE_URL
       key = process.env.HRD_CDN_KEY
       break;
-    default:   
+    default:
       break;
   }
   let url = `${baseUrl}pickup_${req.params.country.toLowerCase()}.json${key}`
   console.log(url)
-  try{
+  try {
     let response = await axios.get(url).then(res => res.data)
-    if(response && response.length > 0){
-      res.status(httpStatus.OK).send({'message':'success','data': response});
-    }else{
-      res.status(httpStatus.OK).send({'message':'error','data':'Data not found'});
+    if (response && response.length > 0) {
+      res.status(httpStatus.OK).send({ 'message': 'success', 'data': response });
+    } else {
+      res.status(httpStatus.OK).send({ 'message': 'error', 'data': 'Data not found' });
     }
-  }catch(err){
-    res.status(httpStatus.OK).send({'message':'error','data':'Pickup Json not found'});
+  } catch (err) {
+    res.status(httpStatus.OK).send({ 'message': 'error', 'data': 'Pickup Json not found' });
   }
 });
+
+const convertUrlToBlob = catchAsync(async (req, res, next) => {
+  const { url } = req.body;
+  console.log("------", req)
+  try {
+    if (url) {
+      const data = await fetch(url);
+      const buffer = await data.buffer();
+      const contentType = await data.headers.get("Content-Type")
+      const base64 = await buffer.toString('base64');
+      res.status(httpStatus.OK).send({ 'message': 'success', 'data': "data:" + contentType + ';base64,' + base64 });
+    } else {
+      res.status(httpStatus.OK).send({ 'message': 'error', 'data': "parameter missing." });
+    }
+
+  } catch (error) {
+    console.log("error ", error)
+    res.status(httpStatus.OK).send({ 'message': 'error', 'data': 'Error' });
+  }
+})
+
+// function blobToBase64(blob) {
+//   return new Promise((resolve, _) => {
+//     const reader = new FileReader();
+//     reader.onloadend = () => resolve(reader.result);
+//     reader.readAsDataURL(blob);
+//   });
+// }
 
 module.exports = {
   createTerminal,
   getTerminals,
   updateTerminal,
   updateCurrentDisplayingVersion,
-  getPickupStore
+  getPickupStore,
+  convertUrlToBlob
 };
 
 
