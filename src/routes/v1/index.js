@@ -2,7 +2,8 @@ const express = require('express');
 const terminalRoute = require('./TerminalRoute');
 const dmbVersionRoute = require('./dmbVersionRoute');
 const seedRoute = require('./seedingRoutes');
- 
+const serverSentEventsRoute = require('./serverSentEventsRoute');
+
 
 const router = express.Router();
 
@@ -27,6 +28,10 @@ const defaultRoutes = [
     path: '/seed',
     route: seedRoute,
   },
+  {
+    path: '/server-events',
+    route: serverSentEventsRoute,
+  },
 ];
 
 // const devRoutes = [
@@ -47,5 +52,5 @@ defaultRoutes.forEach((route) => {
 //     router.use(route.path, route.route);
 //   });
 // }
- 
+
 module.exports = router;

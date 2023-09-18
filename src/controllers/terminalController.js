@@ -8,12 +8,15 @@ const { cmsEndPoint } = require('../config/constants')
 var fetch = require("node-fetch")
 let options = { json: true };
 
+
 const createTerminal = catchAsync(async (req, res) => {
   console.log('== Inside createTerminal ==')
   const InputParams = req.params
+  console.log('-----InputParams-------', InputParams)
   const inputBody = req.body
+  console.log('----inputBody-----', inputBody)
   const dataExist = await Terminal.findOne({ macAddress: inputBody.macAddress });
-  console.log(dataExist)
+  console.log('---mongores---', dataExist)
 
   if (dataExist) {
     res.status(httpStatus.OK).send(dataExist);
@@ -25,12 +28,14 @@ const createTerminal = catchAsync(async (req, res) => {
 
     const storeParams = {
       'addressSubType': 'DELIVERY',
-      'lat': '24.4638305',
-      'lng': '54.67403110000001',
+      'lat': inputBody.lat,
+      'lng': inputBody.lng,
       'screen': 'LOCATION',
-      'areaId': 161,
-      'storeId': 3844
+      'areaId': inputBody.areaId,
+      'storeId': inputBody.storeId
     }
+
+
 
     const headers = {
       'brand': 'KFC',
@@ -42,6 +47,8 @@ const createTerminal = catchAsync(async (req, res) => {
       'devicemodel': 'DMB',
       'country': 'UAE',
       'osversion': '15.7.3',
+      'truecountry': 'UAE',
+      'channel': 'kfcapp',
     }
 
     if (inputBody.isLocation) {
@@ -134,13 +141,13 @@ const createTerminal = catchAsync(async (req, res) => {
           }
         }
         console.log('cmsTerminalData:', cmsTerminalData)
-        // cmsResult=await axios.post(url, cmsTerminalData, {})
+        cmsResult = await axios.post(url, cmsTerminalData, {})
       } catch (e) {
         console.log('terminal sync errr  :', e)
 
       }
 
-      if (cmsResult.data.success) {
+      if (cmsResult?.data?.success) {
         const updateResult = await Terminal.updateOne({ terminalId: id }, { syncToCms: '1' }, {})
         console.log('updateResult:', updateResult)
       }
@@ -151,6 +158,7 @@ const createTerminal = catchAsync(async (req, res) => {
     }
   }
 });
+
 
 const getTerminals = catchAsync(async (req, res) => {
   console.log('== Inside getTerminals ==', req.body)
@@ -166,7 +174,7 @@ const updateTerminal = catchAsync(async (req, res) => {
 
   if (terminalId) {
     const result = await Terminal.find({ terminalId });
-    console.log('result:', result)
+    console.log('update terminal result:', result)
 
     const updateResult = await Terminal.updateOne({ terminalId }, { ...req.body })
     console.log('updateResult:', updateResult)
@@ -262,7 +270,7 @@ const getPickupStore = catchAsync(async (req, res) => {
 
 const convertUrlToBlob = catchAsync(async (req, res, next) => {
   const { url } = req.body;
-  console.log("------", req)
+  // console.log("------", req)
   try {
     if (url) {
       const data = await fetch(url);
