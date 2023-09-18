@@ -40,10 +40,6 @@ app.options('*', cors());
 // v1 api routes
 app.use('/v1', routes, (req, res, next) => {
   console.log('req:----------', req.query)
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  res.setHeader('Access-Control-Allow-Credentials', true);
 
   if (req.query.syncToPwa) {
     const storeId = req.outputData.storeId
