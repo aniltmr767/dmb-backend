@@ -3,6 +3,7 @@ const terminalRoute = require('./TerminalRoute');
 const dmbVersionRoute = require('./dmbVersionRoute');
 const seedRoute = require('./seedingRoutes');
 const serverSentEventsRoute = require('./serverSentEventsRoute');
+const customSSERoutes = require('./customSSERoutes');
 
 
 const router = express.Router();
@@ -31,6 +32,10 @@ const defaultRoutes = [
   {
     path: '/server-events',
     route: serverSentEventsRoute,
+  },
+  {
+    path: '/custom-sse',
+    route: customSSERoutes,
   },
 ];
 

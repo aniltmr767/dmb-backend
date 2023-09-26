@@ -2,6 +2,8 @@ const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
 const dmbVersionController = require('../controllers/dmbVersionController')
 
+
+
 const createStoreIdConnection = catchAsync(async (req, res, next) => {
   res.writeHead(200, {
     "Content-Type": "text/event-stream",
@@ -48,6 +50,28 @@ const createStoreIdConnection = catchAsync(async (req, res, next) => {
 })
 
 
+const customSSE = (req, res, next) => {
+  const headers = {
+    "Content-Type": "text/event-stream",
+    Connection: "keep-alive",
+  };
+  res.writeHead(200, headers);
+
+
+
+  setInterval(() => {
+    const data = Math.floor(100000 + Math.random() * 900000)
+    const id = Date.now();
+    res.write('id: ' + id + '\n');
+    res.write("data: " + JSON.stringify(data) + "\n\n");
+  }, 5000)
+
+  res.on("close", () => {
+    console.log("connection closed ", req.headers);
+    res.end();
+  })
+}
+
 const getDmbData = catchAsync(async (res, input) => {
   const result = await dmbVersionController
 })
@@ -74,12 +98,14 @@ const getUpcomingSchedule = catchAsync(async (res, input) => {
 
 
 const emitSSE = (res, data) => {
+  console.log("-----------------------emit SSE----------------------------------")
   const id = (new Date()).toLocaleTimeString();
   res.write('id: ' + id + '\n');
   res.write("data: " + JSON.stringify(data) + "\n\n");
-  // res.end()
+  // res.end();
 };
 
 module.exports = {
   createStoreIdConnection,
+  customSSE
 }
