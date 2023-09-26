@@ -51,13 +51,23 @@ const createStoreIdConnection = catchAsync(async (req, res, next) => {
 
 
 const customSSE = (req, res, next) => {
+   const { lastEventId } = req?.query
   const headers = {
     "Content-Type": "text/event-stream",
     Connection: "keep-alive",
     "Cache-Control": "no-cache",
     "X-Accel-Buffering": "no"
   };
-  res.writeHead(200, headers);
+  if (req.headers["Last-Event-ID"]) {
+    console.log("-----------------Last-Event-ID--------------");
+    console.log(req.headers["Last-Event-ID"])
+  }
+
+  console.log("req header ", req?.headers)
+
+  // res.writeHead(200, headers);
+  res.flushHeaders();
+
 
 
   const interval = setInterval(() => {
@@ -69,7 +79,7 @@ const customSSE = (req, res, next) => {
 
   res.on("close", () => {
     clearInterval(interval)
-    console.log("connection closed ", req.headers);
+    console.log("connection closed ", req?.headers);
     res.end();
   })
 }
