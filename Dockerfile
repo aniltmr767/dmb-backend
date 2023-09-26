@@ -1,8 +1,8 @@
 FROM node:14-alpine AS builder
 ENV NODE_ENV production
 
-RUN mkdir -p /main
-WORKDIR /main
+RUN mkdir -p /SSE
+WORKDIR /SSE
 
 COPY /package.json .
 RUN npm install
