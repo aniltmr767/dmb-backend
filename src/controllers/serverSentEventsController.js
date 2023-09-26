@@ -58,15 +58,17 @@ const customSSE = (req, res, next) => {
     "Cache-Control": "no-cache",
     "X-Accel-Buffering": "no"
   };
-  if (req.headers["Last-Event-ID"]) {
+  if (req.headers["last-event-id"]) {
     console.log("-----------------Last-Event-ID--------------");
-    console.log(req.headers["Last-Event-ID"])
+    console.log(req.headers["last-event-id"])
+    headers["Sse-Stream-Status"] = "continue"
   }
 
   console.log("req header ", req?.headers)
 
   res.writeHead(200, headers);
   res.flushHeaders();
+
 
 
 
