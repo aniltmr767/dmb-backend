@@ -54,12 +54,13 @@ const customSSE = (req, res, next) => {
   const headers = {
     "Content-Type": "text/event-stream",
     Connection: "keep-alive",
+    "Cache-Control": "no-cache",
+    "X-Accel-Buffering": "no"
   };
   res.writeHead(200, headers);
 
 
-
-  setInterval(() => {
+  const interval = setInterval(() => {
     const data = Math.floor(100000 + Math.random() * 900000)
     const id = Date.now();
     res.write('id: ' + id + '\n');
@@ -67,6 +68,7 @@ const customSSE = (req, res, next) => {
   }, 5000)
 
   res.on("close", () => {
+    clearInterval(interval)
     console.log("connection closed ", req.headers);
     res.end();
   })
