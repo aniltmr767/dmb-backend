@@ -41,6 +41,12 @@ app.options('*', cors());
 app.use('/v1', routes, (req, res, next) => {
   console.log('req:----------', req.query)
 
+  if (req.method === 'OPTIONS') {
+    req.writeHead(200);
+    req.end();
+    return;
+  }
+
   if (req.query.syncToPwa) {
     const storeId = req.outputData.storeId
     console.log('storeId:-------------', storeId)
