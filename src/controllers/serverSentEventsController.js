@@ -65,7 +65,7 @@ const customSSE = (req, res, next) => {
 
   console.log("req header ", req?.headers)
 
-  // res.writeHead(200, headers);
+  res.writeHead(200, headers);
   res.flushHeaders();
 
 
