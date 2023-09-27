@@ -1,6 +1,7 @@
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
-const dmbVersionController = require('../controllers/dmbVersionController')
+const dmbVersionController = require('../controllers/dmbVersionController');
+const { SseEvents } = require('../models');
 
 
 
@@ -50,22 +51,56 @@ const createStoreIdConnection = catchAsync(async (req, res, next) => {
 })
 
 
-const customSSE = (req, res, next) => {
+const customSSE = async (req, res, next) => {
+  const { lastEventId } = req?.query
   const headers = {
     "Content-Type": "text/event-stream",
     Connection: "keep-alive",
     "Cache-Control": "no-cache",
     "X-Accel-Buffering": "no"
   };
+
+
   res.writeHead(200, headers);
+  res.flushHeaders();
 
+  console.log("----------------------- last event id ----------------------")
+  console.log(req.headers["last-event-id"])
+  if (req.headers["last-event-id"]) {
+    const result_ = await SseEvents.find({
+      lastEventId: { $gt: req.headers["last-event-id"], $lt: Date.now() },
+    })
 
-  const interval = setInterval(() => {
+    const deleteResult = await SseEvents.deleteMany({
+      lastEventId: { $lt: req.headers["last-event-id"] },
+    })
+
+    // const result___ = await SseEvents.find();
+
+    // if (result___) {
+    //   res.write("data: " + JSON.stringify(result___) + "\n\n");
+    // }
+
+    if (result_) {
+      const lostResult = {
+        type: "lost",
+        data: result_
+      }
+      res.write("data: " + JSON.stringify(lostResult) + "\n\n");
+    }
+  }
+
+  const interval = setInterval(async () => {
     const data = Math.floor(100000 + Math.random() * 900000)
     const id = Date.now();
     res.write('id: ' + id + '\n');
     res.write("data: " + JSON.stringify(data) + "\n\n");
-  }, 5000)
+    const body = {
+      lastEventId: id,
+      message: data
+    }
+    const sseResult = await SseEvents.create(body);
+  }, 1000 * 10)
 
   res.on("close", () => {
     clearInterval(interval)
