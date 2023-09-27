@@ -82,7 +82,7 @@ const customSSE = (req, res, next) => {
       }
 
        const deleteResult = await SseEvents.deleteMany({
-        lastEventId: { $lt: Date.now() },
+        lastEventId: { $lt: lastEventIdHeader },
       })
     }, 1000 * 10)
 
