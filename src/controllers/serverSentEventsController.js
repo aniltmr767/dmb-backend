@@ -97,7 +97,7 @@ const customSSE =  (req, res, next) => {
       message: data
     }
     const sseResult = await SseEvents.create(body);
-  }, 1000 * 10)
+  }, 1000 * 15)
 
   res.on("close", () => {
     // clearInterval(interval)
