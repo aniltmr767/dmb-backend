@@ -66,7 +66,8 @@ const customSSE =  (req, res, next) => {
 
   console.log("----------------------- last event id ----------------------")
   console.log(req.headers["last-event-id"])
-   if (req.headers["last-event-id"]) {
+  const lastEventIdHeader = req.headers["last-event-id"];
+   if (lastEventIdHeader) {
     setTimeout(async () => {
       const result_ = await SseEvents.find({
         lastEventId: { $gt: req.headers["last-event-id"], $lt: Date.now() },
@@ -96,13 +97,16 @@ const customSSE =  (req, res, next) => {
       lastEventId: id,
       message: data
     }
-    const sseResult = await SseEvents.create(body);
+    if(lastEventIdHeader){
+      const sseResult = await SseEvents.create(body);
+    }
+    
   }, 1000 * 15)
 
   res.on("close", () => {
-    // clearInterval(interval)
+    clearInterval(interval)
     console.log("connection closed ", req?.headers);
-    // res.end();
+    res.end();
   })
 }
 
