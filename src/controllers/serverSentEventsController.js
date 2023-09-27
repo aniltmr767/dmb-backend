@@ -83,7 +83,7 @@ const customSSE =  (req, res, next) => {
         }
         res.write("data: " + JSON.stringify(lostResult) + "\n\n");
       }
-    }, 1000 * 10)
+    }, 1000 * 20)
 
   }
 
