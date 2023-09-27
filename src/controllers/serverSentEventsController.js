@@ -103,9 +103,9 @@ const customSSE = async (req, res, next) => {
   }, 1000 * 10)
 
   res.on("close", () => {
-    clearInterval(interval)
-    console.log("connection closed ", req.headers);
-    res.end();
+    // clearInterval(interval)
+    console.log("connection closed ", req?.headers);
+    // res.end();
   })
 }
 
