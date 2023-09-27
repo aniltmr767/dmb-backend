@@ -51,7 +51,7 @@ const createStoreIdConnection = catchAsync(async (req, res, next) => {
 })
 
 
-const customSSE =  (req, res, next) => {
+const customSSE = (req, res, next) => {
   const { lastEventId } = req?.query
   const headers = {
     "Content-Type": "text/event-stream",
@@ -59,32 +59,32 @@ const customSSE =  (req, res, next) => {
     "Cache-Control": "no-cache",
     "X-Accel-Buffering": "no"
   };
-
-
+  
   res.writeHead(200, headers);
   res.flushHeaders();
 
   console.log("----------------------- last event id ----------------------")
   console.log(req.headers["last-event-id"])
+
   const lastEventIdHeader = req.headers["last-event-id"];
-   if (lastEventIdHeader) {
+  if (lastEventIdHeader) {
     setTimeout(async () => {
       const result_ = await SseEvents.find({
         lastEventId: { $gt: req.headers["last-event-id"], $lt: Date.now() },
       })
-
-      const deleteResult = await SseEvents.deleteMany({
-        lastEventId: { $lt: req.headers["last-event-id"] },
-      })
-
       if (result_) {
         const lostResult = {
           type: "lost",
           data: result_
         }
+
         res.write("data: " + JSON.stringify(lostResult) + "\n\n");
       }
-    }, 1000 * 20)
+
+       const deleteResult = await SseEvents.deleteMany({
+        lastEventId: { $lt: Date.now() },
+      })
+    }, 1000 * 10)
 
   }
 
@@ -93,18 +93,18 @@ const customSSE =  (req, res, next) => {
     const id = Date.now();
     res.write('id: ' + id + '\n');
     res.write("data: " + JSON.stringify(data) + "\n\n");
+    res.write("retry:10000\n");
     const body = {
       lastEventId: id,
       message: data
     }
-    if(lastEventIdHeader){
-      const sseResult = await SseEvents.create(body);
-    }
-    
-  }, 1000 * 15)
+    // if (lastEventIdHeader) {
+    const sseResult = await SseEvents.create(body);
+    // }
+  }, 1000 * 10)
 
   res.on("close", () => {
-    clearInterval(interval);
+    clearInterval(interval)
     console.log("connection closed ", req?.headers);
     res.end();
   })
