@@ -104,7 +104,7 @@ const customSSE =  (req, res, next) => {
   }, 1000 * 15)
 
   res.on("close", () => {
-    clearInterval(interval)
+    clearInterval(interval);
     console.log("connection closed ", req?.headers);
     res.end();
   })
