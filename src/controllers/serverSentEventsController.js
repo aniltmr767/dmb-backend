@@ -8,7 +8,7 @@ const { SseEvents } = require('../models');
 const createStoreIdConnection = catchAsync(async (req, res, next) => {
   res.writeHead(200, {
     "Content-Type": "text/event-stream",
-    "Cache-Control": "no-cache",
+    // "Cache-Control": "no-cache",
     Connection: "keep-alive",
   });
   res.flushHeaders();
