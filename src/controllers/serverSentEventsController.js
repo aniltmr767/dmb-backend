@@ -51,7 +51,7 @@ const createStoreIdConnection = catchAsync(async (req, res, next) => {
 })
 
 
-const customSSE = async (req, res, next) => {
+const customSSE =  (req, res, next) => {
   const { lastEventId } = req?.query
   const headers = {
     "Content-Type": "text/event-stream",
@@ -66,28 +66,25 @@ const customSSE = async (req, res, next) => {
 
   console.log("----------------------- last event id ----------------------")
   console.log(req.headers["last-event-id"])
-  if (req.headers["last-event-id"]) {
-    const result_ = await SseEvents.find({
-      lastEventId: { $gt: req.headers["last-event-id"], $lt: Date.now() },
-    })
+   if (req.headers["last-event-id"]) {
+    setTimeout(async () => {
+      const result_ = await SseEvents.find({
+        lastEventId: { $gt: req.headers["last-event-id"], $lt: Date.now() },
+      })
 
-    const deleteResult = await SseEvents.deleteMany({
-      lastEventId: { $lt: req.headers["last-event-id"] },
-    })
+      const deleteResult = await SseEvents.deleteMany({
+        lastEventId: { $lt: req.headers["last-event-id"] },
+      })
 
-    // const result___ = await SseEvents.find();
-
-    // if (result___) {
-    //   res.write("data: " + JSON.stringify(result___) + "\n\n");
-    // }
-
-    if (result_) {
-      const lostResult = {
-        type: "lost",
-        data: result_
+      if (result_) {
+        const lostResult = {
+          type: "lost",
+          data: result_
+        }
+        res.write("data: " + JSON.stringify(lostResult) + "\n\n");
       }
-      res.write("data: " + JSON.stringify(lostResult) + "\n\n");
-    }
+    }, 1000 * 10)
+
   }
 
   const interval = setInterval(async () => {
